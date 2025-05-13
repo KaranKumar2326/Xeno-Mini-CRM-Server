@@ -41,7 +41,7 @@ app.use(cors({
 }));
 
 app.use(cors({
-  origin: 'localhost:3000',  // Allow requests from the frontend (localhost:3000)
+  origin: 'https://xeno-mini-crm-ten.vercel.app/',  // Allow requests from the frontend (localhost:3000)
   methods: ['GET', 'POST','OPTIONS'],        // Allow specific methods
   credentials: true,                // Allow cookies and credentials if needed
 }));
