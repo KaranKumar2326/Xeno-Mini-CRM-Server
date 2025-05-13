@@ -10,6 +10,9 @@
     "build": "tsc",
     "start": "node dist/app.js"
   },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
