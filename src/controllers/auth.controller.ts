@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 // Load frontend URL from environment variable
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'https://xeno-mini-crm-ten.vercel.app';
 
 // Extend the Request interface for session data
 declare global {
