@@ -37,17 +37,14 @@ const allowedOrigins = [
   'https://xeno-mini-crm-ten.vercel.app', // Vercel (Production)
 ];
 
+
+
 const corsOptions = {
-  origin: (origin: string, callback: Function) => {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true); // Allow the request
-    } else {
-      callback(new Error('Not allowed by CORS')); // Reject the request
-    }
-  },
-  methods: ['GET', 'POST', 'OPTIONS','PUT', 'DELETE'],
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'OPTIONS', 'PUT', 'DELETE'], // Allow all necessary methods
   credentials: true, // Allow cookies and credentials if needed
 };
+
 
 app.use(cors(corsOptions)); // Apply CORS middleware
 
