@@ -9,25 +9,19 @@ import campaignRoutes from './src/routes/campaign.routes';
 import deliveryRoutes from './src/routes/delivery.routes';
 import { errorHandler } from './src/middlewares/error';
 import { startOrderConsumer } from './src/services/redis.consumer';
-// import { startCampaignWorker } from './src/workers/campaign.worker';
 import swaggerUi from 'swagger-ui-express';
 import { swaggerSpec } from './src/config/swagger';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
-import "./src/workers/campaign.worker";
+import './src/workers/campaign.worker';
 import { requestLogger } from './src/middlewares/logger';
 import segmentRoutes from './src/routes/segment.routes';
-// import mockVendor from './src/api/mock-vendor';
 import mockVendorRouter from './src/api/mock-vendor';
 import authRoutes from './src/routes/auth.routes';
 
 import passport from 'passport';
 import './src/config/passport'; // Import the Passport configuration
 import session from 'express-session';
-
-// import cors from 'cors';
-
-
 
 dotenv.config();
 
@@ -36,20 +30,31 @@ const PORT = process.env.PORT || 3001;
 
 // Security Middleware
 app.use(helmet());
-app.use(cors({
-  origin: '*'
-}));
 
-app.use(cors({
-  origin: 'https://xeno-mini-crm-ten.vercel.app/',  // Allow requests from the frontend (localhost:3000)
-  methods: ['GET', 'POST','OPTIONS'],        // Allow specific methods
-  credentials: true,                // Allow cookies and credentials if needed
-}));
-app.use(express.json());
+// Define allowed origins dynamically based on the environment
+const allowedOrigins = [
+  'http://localhost:3000', // Local development
+  'https://xeno-mini-crm-ten.vercel.app', // Vercel (Production)
+];
+
+const corsOptions = {
+  origin: (origin: string, callback: Function) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true); // Allow the request
+    } else {
+      callback(new Error('Not allowed by CORS')); // Reject the request
+    }
+  },
+  methods: ['GET', 'POST', 'OPTIONS'],
+  credentials: true, // Allow cookies and credentials if needed
+};
+
+app.use(cors(corsOptions)); // Apply CORS middleware
+
 // Rate Limiting
-const limiter = rateLimit({ 
+const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
 
@@ -61,42 +66,31 @@ app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
 // API Documentation
-app.use('/api-docs', 
-  swaggerUi.serve, 
-  swaggerUi.setup(swaggerSpec)
-);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+// Passport Initialization
 app.use(passport.initialize());
-
-
-
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',  // Secret key for encryption
   resave: false,
   saveUninitialized: true,
 }));
-
-// app.use(passport.initialize());
 app.use(passport.session());
+
 // Routes
 app.use('/api/customers', customerRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/campaigns', campaignRoutes);
 app.use('/api/delivery', deliveryRoutes);
 app.use('/api/segments', segmentRoutes);
-// app.use('/api', require('./api/mock-vendor'));
-// app.use('/api/mock-vendor', mockVendorRouter);
 app.use('/api', mockVendorRouter);
-app.use('/auth', authRoutes); 
-
-
-
-
+app.use('/auth', authRoutes);
 
 // Health Check
 app.get('/ping', (req, res) => {
   res.status(200).json({ 
     status: 'healthy',
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
 
@@ -108,10 +102,9 @@ const start = async () => {
   try {
     await connectDB();
     await initRedis();
-    
+
     // Start background workers
     startOrderConsumer();
-    // startCampaignWorker();
     
     app.listen(PORT, () => {
       console.log(`
