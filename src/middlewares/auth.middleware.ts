@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { OAuth2Client } from 'google-auth-library';
-
+// Define a custom User type or use 'any' for compatibility
+type User = any;
 // Extend the Express Request type to include the user property
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user?: User; // Make this 'any' to match the 'passport' definition
     }
   }
 }

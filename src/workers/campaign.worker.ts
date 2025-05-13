@@ -83,7 +83,7 @@ const startWorker = async () => {
         const messages = await redisClient.lRange('delivery:updates', 0, BATCH_SIZE - 1);
         if (messages.length === 0) return;
 
-        const updates = messages.map(msg => JSON.parse(msg) as DeliveryUpdate);
+        const updates = messages.map(msg => JSON.parse(msg.toString()) as DeliveryUpdate);
         await processBatch(updates);
 
         // Remove processed messages

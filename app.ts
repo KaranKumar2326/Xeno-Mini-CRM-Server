@@ -23,6 +23,7 @@ import authRoutes from './src/routes/auth.routes';
 
 import passport from 'passport';
 import './src/config/passport'; // Import the Passport configuration
+import session from 'express-session';
 
 // import cors from 'cors';
 
@@ -46,7 +47,7 @@ app.use(cors({
 }));
 app.use(express.json());
 // Rate Limiting
-const limiter = rateLimit({
+const limiter = rateLimit({ 
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100 // limit each IP to 100 requests per windowMs
 });
@@ -65,6 +66,17 @@ app.use('/api-docs',
   swaggerUi.setup(swaggerSpec)
 );
 app.use(passport.initialize());
+
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'your-secret-key',  // Secret key for encryption
+  resave: false,
+  saveUninitialized: true,
+}));
+
+// app.use(passport.initialize());
+app.use(passport.session());
 // Routes
 app.use('/api/customers', customerRoutes);
 app.use('/api/orders', orderRoutes);
@@ -74,7 +86,7 @@ app.use('/api/segments', segmentRoutes);
 // app.use('/api', require('./api/mock-vendor'));
 // app.use('/api/mock-vendor', mockVendorRouter);
 app.use('/api', mockVendorRouter);
-app.use('/api/auth', authRoutes); 
+app.use('/auth', authRoutes); 
 
 
 

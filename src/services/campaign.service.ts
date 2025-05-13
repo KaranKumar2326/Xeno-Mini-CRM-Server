@@ -38,7 +38,8 @@ export class CampaignService {
     while (true) {
       let campaignId: string | null = null;
       try {
-        campaignId = await redisClient.rPop('campaign:queue');
+        const result = await redisClient.rPop('campaign:queue');
+        campaignId = typeof result === 'string' ? result : null;
         if (!campaignId) {
           await new Promise(resolve => setTimeout(resolve, 5000));
           continue;

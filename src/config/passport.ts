@@ -1,71 +1,55 @@
-// src/config/passport.ts
+// lib/passport.ts
 import passport from 'passport';
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
-import Customer from '../models/Customer';
 import dotenv from 'dotenv';
 
+// Load environment variables first
 dotenv.config();
 
-// Validate environment variables
+console.log('[PASSPORT] Initializing Google OAuth strategy...');
+console.log('[PASSPORT] Checking environment variables...');
+
+// Validate environment variables before creating strategy
 if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !process.env.GOOGLE_CALLBACK_URL) {
+  console.error('[PASSPORT] Missing required environment variables:');
+  console.error('- GOOGLE_CLIENT_ID:', !!process.env.GOOGLE_CLIENT_ID);
+  console.error('- GOOGLE_CLIENT_SECRET:', !!process.env.GOOGLE_CLIENT_SECRET);
+  console.error('- GOOGLE_CALLBACK_URL:', !!process.env.GOOGLE_CALLBACK_URL);
   throw new Error('Missing Google OAuth environment variables');
 }
 
-console.log('Google OAuth Config:');
-console.log('Client ID:', process.env.GOOGLE_CLIENT_ID);
-console.log('Callback URL:', process.env.GOOGLE_CALLBACK_URL);
+console.log('[PASSPORT] Environment variables verified');
+console.log('[PASSPORT] Initializing Google Strategy...');
 
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: process.env.GOOGLE_CALLBACK_URL,
-  passReqToCallback: true
-}, async (req: any, accessToken: string, refreshToken: string, profile: any, done: Function) => {
-  try {
-    console.log('Google profile received:', profile.id);
-    
-    if (!profile.emails || profile.emails.length === 0) {
-      return done(new Error('No email found in Google profile'), false);
-    }
+}, (accessToken, refreshToken, profile, done) => {
+  console.log('\n[PASSPORT] Google OAuth callback triggered');
+  console.log('[PASSPORT] Access Token:', accessToken ? 'Received' : 'Missing');
+  console.log('[PASSPORT] Profile:', {
+    id: profile.id,
+    displayName: profile.displayName,
+    emails: profile.emails,
+  });
 
-    const email = profile.emails[0].value;
-    let customer = await Customer.findOne({ email });
-
-    if (!customer) {
-      customer = new Customer({
-        name: profile.displayName,
-        email,
-        googleId: profile.id,
-        totalSpend: 0,
-        visitCount: 1,
-        segments: [],
-      });
-    } else {
-      customer.visitCount += 1;
-    }
-
-    await customer.save();
-    return done(null, customer);
-
-  } catch (err) {
-    console.error('Error in Google Strategy:', err);
-    return done(err, false);
-  }
+  // No user storage - just pass the profile through
+  console.log('[PASSPORT] Returning user profile to passport');
+  return done(null, profile);
 }));
 
-// Serialization
-passport.serializeUser((customer: any, done) => {
-  done(null, customer.id);
+console.log('[PASSPORT] Setting up serialization...');
+
+passport.serializeUser((user, done) => {
+  console.log('\n[PASSPORT] Serializing user:', user);
+  done(null, user);
 });
 
-// Deserialization
-passport.deserializeUser(async (id: string, done) => {
-  try {
-    const customer = await Customer.findById(id);
-    done(null, customer);
-  } catch (err) {
-    done(err, null);
-  }
+passport.deserializeUser((user, done) => {
+  console.log('\n[PASSPORT] Deserializing user:', user);
+  done(null, user);
 });
 
+console.log('[PASSPORT] Configuration complete');
 export default passport;

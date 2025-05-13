@@ -1,20 +1,17 @@
-// src/routes/auth.routes.ts
+// routes/auth.ts
 import { Router } from 'express';
-import {
-  googleLogin,
-  googleCallback,
-  loginFailed
-} from '../controllers/auth.controller';
+import { googleAuth, googleCallback } from '../controllers/auth.controller';
 
 const router = Router();
 
-// Initiate Google OAuth
-router.get('/google', googleLogin);
+router.get('/google', (req, res) => {
+  console.log('Google auth route hit');
+  googleAuth(req, res);
+});
 
-// Google OAuth callback
-router.get('/google/callback', googleCallback);
-
-// Failed authentication
-router.get('/login/failed', loginFailed);
+router.get('/google/callback', (req, res) => {
+  console.log('Google callback route hit');
+  googleCallback(req, res);
+}); 
 
 export default router;

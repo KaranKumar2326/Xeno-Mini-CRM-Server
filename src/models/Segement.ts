@@ -1,3 +1,4 @@
+// src/models/Segement.ts
 import { Schema, model, Types } from 'mongoose';
 import { ISegment, RuleGroup, Rule } from '../types';
 
@@ -38,7 +39,7 @@ const RuleGroupSchema = new Schema<RuleGroup>({
     required: [true, 'Condition is required']
   },
   rules: {
-    type: [Schema.Types.Mixed],
+    type: [RuleSchema],  // Change from Mixed to RuleSchema
     required: [true, 'Rules are required'],
     validate: {
       validator: function(rules: any[]) {
@@ -67,7 +68,7 @@ const SegmentSchema = new Schema<ISegment>({
     maxlength: [500, 'Cannot exceed 500 characters']
   },
   rules: {
-    type: RuleGroupSchema,
+    type: RuleGroupSchema,  // Use RuleGroupSchema here
     required: [true, 'Rules are required']
   },
   campaigns: [{
