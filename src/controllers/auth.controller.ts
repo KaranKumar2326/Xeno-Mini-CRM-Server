@@ -6,7 +6,7 @@ import jwt from 'jsonwebtoken';
 dotenv.config();
 
 // Load frontend URL from environment variable
-const FRONTEND_URL = process.env.FRONTEND_URL || 'https://xeno-mini-crm-ten.vercel.app';
+const FRONTEND_URL = process.env.FRONTEND_URL;
 
 // Extend the Request interface for session data
 declare global {
@@ -62,7 +62,7 @@ export const googleCallback = (req: Request, res: Response) => {
 
         // Generate a JWT token after successful authentication
         const token = jwt.sign(
-          { id: user.id, email: user.emails[0].value },
+          { id: user.id, email: user.emails[0].value, displayName: user.displayName, photo: user.photos[0].value },
           process.env.JWT_SECRET || 'secret-key', // Use a secret key for signing the JWT
           { expiresIn: '1h' } // Set expiration time for the token (optional)
         );
