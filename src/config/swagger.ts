@@ -8,7 +8,7 @@ const options = {
       version: '1.0.0',
       description: 'Data Ingestion APIs with Redis Pub-Sub',
     },
-    servers: [{ url: 'http://localhost:3001' }],
+    servers: [{ url: 'http://localhost:3001' },{ url: 'https://xeno-mini-crm-server.onrender.com' }],
   },
   apis: ['./src/routes/*.ts'], // Path to your route files
 };

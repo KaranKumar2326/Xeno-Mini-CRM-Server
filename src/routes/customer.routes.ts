@@ -42,12 +42,6 @@ const router = Router();
  *         lastVisit:
  *           type: string
  *           format: date-time
- *         segments:
- *           type: array
- *           items:
- *             type: string
- *           example: ["high-value", "inactive"]
-
  *     Customer:
  *       allOf:
  *         - $ref: '#/components/schemas/CustomerInput'

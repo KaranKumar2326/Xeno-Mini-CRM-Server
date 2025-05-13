@@ -9,7 +9,7 @@ const dotenv_1 = __importDefault(require("dotenv"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 dotenv_1.default.config();
 // Load frontend URL from environment variable
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:3000';
+const FRONTEND_URL = process.env.FRONTEND_URL;
 // Google authentication route
 const googleAuth = (req, res) => {
     console.log('[BACKEND] /auth/google endpoint hit');

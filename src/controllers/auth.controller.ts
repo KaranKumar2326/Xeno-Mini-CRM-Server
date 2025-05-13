@@ -7,6 +7,7 @@ dotenv.config();
 
 // Load frontend URL from environment variable
 const FRONTEND_URL = process.env.FRONTEND_URL;
+console.log('[BACKEND] Frontend URL:', FRONTEND_URL);
 
 // Extend the Request interface for session data
 declare global {
@@ -19,6 +20,8 @@ declare global {
     }
   }
 }
+
+
 
 // Google authentication route
 export const googleAuth = (req: Request, res: Response) => {
